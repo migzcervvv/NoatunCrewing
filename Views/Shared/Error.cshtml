@@ -1,0 +1,309 @@
+﻿﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Something Went Wrong</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(-45deg,#0f172a,#1e3a8a,#2563eb,#0f172a);
+            background-size: 400% 400%;
+            animation: gradient 18s ease infinite;
+            position: relative;
+        }
+
+        @@keyframes gradient {
+            0% {
+                background-position: 0% 50%;
+            }
+
+            50% {
+                background-position: 100% 50%;
+            }
+
+            100% {
+                background-position: 0% 50%;
+            }
+        }
+
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: .45;
+            animation: float 12s ease-in-out infinite;
+        }
+
+            .blob:nth-child(1) {
+                width: 350px;
+                height: 350px;
+                background: #60a5fa;
+                top: -100px;
+                left: -80px;
+            }
+
+            .blob:nth-child(2) {
+                width: 280px;
+                height: 280px;
+                background: #38bdf8;
+                bottom: -80px;
+                right: -60px;
+                animation-delay: -4s;
+            }
+
+            .blob:nth-child(3) {
+                width: 220px;
+                height: 220px;
+                background: #818cf8;
+                top: 20%;
+                right: 20%;
+                animation-delay: -7s;
+            }
+
+        @@keyframes float {
+            0%, 100% {
+                transform: translateY(0) scale(1);
+            }
+
+            50% {
+                transform: translateY(-30px) scale(1.1);
+            }
+        }
+
+        .card {
+            position: relative;
+            width: min(700px,90%);
+            padding: 60px;
+            text-align: center;
+            border-radius: 28px;
+            backdrop-filter: blur(25px);
+            background: rgba(255,255,255,.12);
+            border: 1px solid rgba(255,255,255,.18);
+            box-shadow: 0 30px 80px rgba(0,0,0,.35), inset 0 1px rgba(255,255,255,.15);
+            color: white;
+            z-index: 10;
+        }
+
+        .error-code {
+            font-size: 8rem;
+            font-weight: 900;
+            letter-spacing: 8px;
+            line-height: 1;
+            background: linear-gradient(90deg,#fff,#93c5fd);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 15px 35px rgba(0,0,0,.25);
+        }
+
+        h1 {
+            margin-top: 15px;
+            font-size: 2.3rem;
+            font-weight: 700;
+        }
+
+        p {
+            margin: 20px auto 40px;
+            max-width: 550px;
+            color: rgba(255,255,255,.85);
+            font-size: 1.05rem;
+            line-height: 1.8;
+        }
+
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            text-decoration: none;
+            padding: 14px 30px;
+            border-radius: 999px;
+            font-weight: 600;
+            transition: .35s;
+        }
+
+        .primary {
+            background: white;
+            color: #1d4ed8;
+        }
+
+            .primary:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 12px 25px rgba(255,255,255,.35);
+            }
+
+        .secondary {
+            border: 1px solid rgba(255,255,255,.4);
+            color: white;
+            background: rgba(255,255,255,.08);
+        }
+
+            .secondary:hover {
+                background: rgba(255,255,255,.18);
+                transform: translateY(-3px);
+            }
+
+        .icon {
+            width: 90px;
+            height: 90px;
+            margin: 0 auto 25px;
+            border-radius: 50%;
+            background: rgba(255,255,255,.12);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 42px;
+            box-shadow: 0 0 30px rgba(255,255,255,.15);
+        }
+
+        .particles span {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            background: rgba(255,255,255,.7);
+            border-radius: 50%;
+            animation: particle linear infinite;
+        }
+
+        @@keyframes particle {
+            from {
+                transform: translateY(100vh);
+                opacity: 0;
+            }
+
+            20% {
+                opacity: 1;
+            }
+
+            to {
+                transform: translateY(-120px);
+                opacity: 0;
+            }
+        }
+
+        .particles span:nth-child(1) {
+            left: 8%;
+            animation-duration: 15s;
+            animation-delay: -2s;
+        }
+
+        .particles span:nth-child(2) {
+            left: 16%;
+            animation-duration: 12s;
+        }
+
+        .particles span:nth-child(3) {
+            left: 24%;
+            animation-duration: 18s;
+        }
+
+        .particles span:nth-child(4) {
+            left: 35%;
+            animation-duration: 13s;
+        }
+
+        .particles span:nth-child(5) {
+            left: 48%;
+            animation-duration: 20s;
+        }
+
+        .particles span:nth-child(6) {
+            left: 60%;
+            animation-duration: 11s;
+        }
+
+        .particles span:nth-child(7) {
+            left: 72%;
+            animation-duration: 16s;
+        }
+
+        .particles span:nth-child(8) {
+            left: 84%;
+            animation-duration: 14s;
+        }
+
+        .particles span:nth-child(9) {
+            left: 92%;
+            animation-duration: 17s;
+        }
+
+        @@media(max-width:768px) {
+
+            .card {
+                padding: 40px 25px;
+            }
+
+            .error-code {
+                font-size: 5rem;
+            }
+
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            p {
+                font-size: .95rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="blob"></div>
+    <div class="blob"></div>
+    <div class="blob"></div>
+
+    <div class="particles">
+        <span></span><span></span><span></span>
+        <span></span><span></span><span></span>
+        <span></span><span></span><span></span>
+    </div>
+
+    <div class="card">
+
+        <div class="icon">
+            ⚠
+        </div>
+
+        <div class="error-code">500</div>
+
+        <h1>Something went wrong</h1>
+
+        <p>
+            An unexpected error occurred while processing your request.
+            Our system has been notified, and we're working to resolve the problem.
+        </p>
+
+        <div class="buttons">
+            <a href="/" class="btn primary">Return Home</a>
+            <a href="javascript:history.back();" class="btn secondary">Go Back</a>
+        </div>
+
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,24 @@
+﻿@using Microsoft.AspNetCore.Identity
+@model IdentityRole
+@{
+    ViewData["Title"] = "Delete Role";
+}
+
+<div asp-validation-summary="All" class="validation-summary"></div>
+<div class="confirm-panel">
+    <p>Confirm deletion of the following role. This action cannot be undone.</p>
+    <table class="detail-table">
+        <tr>
+            <th>Role Name</th>
+            <td>@Model.Name</td>
+        </tr>
+    </table>
+    <form asp-area="Admin" asp-controller="RoleManagement" asp-action="Delete" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="id" value="@Model.Id" />
+        <div class="form-actions">
+            <button type="submit" class="btn-danger">Delete Role</button>
+            <a asp-action="Index" class="btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>

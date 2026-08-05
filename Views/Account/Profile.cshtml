@@ -1,0 +1,47 @@
+﻿@model ProfileViewModel
+@{
+    ViewData["Title"] = "My Profile";
+}
+<h2>My Profile</h2>
+<form asp-controller="Account" asp-action="Profile" method="post" enctype="multipart/form-data">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+    <div asp-validation-summary="All" class="text-danger"></div>
+    <div class="form-group">
+        <label asp-for="UserName"></label>
+        <p class="form-control-static">@Model.UserName</p>
+    </div>
+    <div class="form-group">
+        <label asp-for="FirstName"></label>
+        <input asp-for="FirstName" class="form-control" />
+        <span asp-validation-for="FirstName"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="LastName"></label>
+        <input asp-for="LastName" class="form-control" />
+        <span asp-validation-for="LastName"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="Email"></label>
+        <input asp-for="Email" class="form-control" />
+        <span asp-validation-for="Email"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="ProfilePhotoFile"></label>
+        @if (!string.IsNullOrEmpty(Model.ProfilePhotoPath))
+        {
+            <div><img src="@Model.ProfilePhotoPath" style="max-width:150px;" /></div>
+        }
+        <input asp-for="ProfilePhotoFile" type="file" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="SignatureImageFile"></label>
+        @if (!string.IsNullOrEmpty(Model.SignatureImagePath))
+        {
+            <div><img src="@Model.SignatureImagePath" style="max-width:150px;" /></div>
+        }
+        <input asp-for="SignatureImageFile" type="file" class="form-control" />
+    </div>
+    <button type="submit" class="btn btn-primary">Save</button>
+    <a asp-action="ChangePassword" class="btn btn-link">Change Password</a>
+</form>

@@ -1,0 +1,76 @@
+@model List<RoleVM>
+@{
+    ViewData["Title"] = "Role Management";
+}
+@section Styles {
+    <style>
+        .shell {
+            padding-top: 10px;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #0b3d5c 0%, #145d82 100%);
+            color: #fff;
+            border-radius: 6px;
+            padding: 24px 28px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+        }
+
+            .header h2 {
+                margin-top: 0;
+                margin-bottom: 6px;
+                font-weight: 600;
+            }
+
+            .header .subtitle {
+                margin-bottom: 12px;
+                opacity: 0.9;
+            }
+
+        .meta {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            opacity: 0.85;
+        }
+    </style>
+}
+<div class="header">
+    <h2>@ViewData["Title"]</h2>
+    <div class="subtitle">Manage Roles in this page</div>
+    <div class="meta">Last refreshed @DateTime.Now.ToString("MMM dd, yyyy")</div>
+</div>
+<div class="admin-toolbar">
+    <a asp-action="Create" class="btn-primary">
+        <i class="fa-solid fa-plus"></i> New Role
+    </a>
+</div>
+<div class="admin-table-wrap">
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>Role Name</th>
+                <th>Assigned Users</th>
+                <th class="text-right">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var r in Model)
+            {
+                <tr>
+                    <td>@r.Name</td>
+                    <td>@r.UserCount</td>
+                    <td class="text-right">
+                        <a asp-action="Edit" asp-route-id="@r.Id" title="Edit">
+                            <i class="fa-solid fa-pen"></i>
+                        </a>
+                        <a asp-action="Delete" asp-route-id="@r.Id" title="Delete" class="text-danger">
+                            <i class="fa-solid fa-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

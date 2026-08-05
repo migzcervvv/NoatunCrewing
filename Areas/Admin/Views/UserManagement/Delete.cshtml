@@ -1,0 +1,31 @@
+﻿@model ApplicationUser
+@{
+    ViewData["Title"] = "Delete User";
+}
+
+<div asp-validation-summary="All" class="validation-summary"></div>
+<div class="confirm-panel">
+    <p>Confirm deletion of the following user. This action cannot be undone.</p>
+    <table class="detail-table">
+        <tr>
+            <th>User Name</th>
+            <td>@Model.UserName</td>
+        </tr>
+        <tr>
+            <th>Full Name</th>
+            <td>@Model.FirstName @Model.LastName</td>
+        </tr>
+        <tr>
+            <th>Email</th>
+            <td>@Model.Email</td>
+        </tr>
+    </table>
+    <form asp-area="Admin" asp-controller="UserManagement" asp-action="Delete" method="post">
+        @Html.AntiForgeryToken()
+        <input type="hidden" name="id" value="@Model.Id" />
+        <div class="form-actions">
+            <button type="submit" class="btn-danger">Delete User</button>
+            <a asp-action="Index" class="btn-secondary">Cancel</a>
+        </div>
+    </form>
+</div>

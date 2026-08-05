@@ -1,0 +1,14 @@
+﻿global using System;
+global using System.Collections.Generic;
+global using System.Linq;
+global using System.Threading.Tasks;
+global using Microsoft.AspNetCore.Authorization;
+global using Microsoft.AspNetCore.Identity;
+global using Microsoft.AspNetCore.Mvc;
+global using Microsoft.AspNetCore.Mvc.ViewFeatures;
+global using NoatunCrewing.Data;
+global using NoatunCrewing.Enums;
+global using NoatunCrewing.Extensions;
+global using NoatunCrewing.Models;
+global using NoatunCrewing.ViewModels;
+global using NoatunCrewing.Services.Interfaces;

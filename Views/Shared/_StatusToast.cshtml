@@ -1,0 +1,92 @@
+@{
+    var status = TempData.GetStatusMessage();
+}
+@if (status is not null)
+{
+    var variant = status.Type switch
+    {
+        StatusMessageType.Success => "success",
+        StatusMessageType.Warning => "warning",
+        StatusMessageType.Error => "error",
+        _ => "info"
+    };
+    var label = status.Type switch
+    {
+        StatusMessageType.Success => "Success",
+        StatusMessageType.Warning => "Warning",
+        StatusMessageType.Error => "Error",
+        _ => "Info"
+    };
+    <div class="toast-stack">
+        <div id="statusToast" class="app-toast app-toast-@variant" role="status" aria-live="polite" data-autodismiss="6000">
+            <span class="app-toast-icon">
+                @switch (status.Type)
+                {
+                    case StatusMessageType.Success:
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+                        break;
+                    case StatusMessageType.Warning:
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0Z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>
+                        break;
+                    case StatusMessageType.Error:
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        break;
+                    default:
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                        break;
+                }
+            </span>
+            <div class="app-toast-body">
+                <span class="app-toast-label">@label</span>
+                <span class="app-toast-text">@status.Text</span>
+            </div>
+            <button type="button" class="app-toast-close" aria-label="Dismiss">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+            </button>
+            <div class="app-toast-progress"></div>
+        </div>
+    </div>
+    <script>
+        (function () {
+            const wrap = document.querySelector(".toast-stack");
+            const toast = document.getElementById("statusToast");
+            if (!toast) return;
+
+            const progress = toast.querySelector(".app-toast-progress");
+            const closeBtn = toast.querySelector(".app-toast-close");
+            const duration = parseInt(toast.dataset.autodismiss || "6000", 10);
+
+            let remaining = duration;
+            let timerId = null;
+            let startedAt = null;
+
+            const dismiss = () => {
+                toast.classList.add("app-toast-hide");
+                toast.addEventListener("animationend", () => wrap?.remove(), { once: true });
+            };
+
+            const start = () => {
+                if (duration <= 0) return;
+                startedAt = Date.now();
+                timerId = setTimeout(dismiss, remaining);
+                if (progress) progress.style.animationPlayState = "running";
+            };
+
+            const pause = () => {
+                if (timerId) {
+                    clearTimeout(timerId);
+                    remaining -= Date.now() - startedAt;
+                    timerId = null;
+                }
+                if (progress) progress.style.animationPlayState = "paused";
+            };
+
+            closeBtn.addEventListener("click", dismiss);
+            toast.addEventListener("mouseenter", pause);
+            toast.addEventListener("mouseleave", start);
+
+            if (progress) progress.style.animationDuration = duration + "ms";
+            start();
+        })();
+    </script>
+}

@@ -1,0 +1,45 @@
+@{
+    var isSuperAdmin = User.IsInRole(AppRoles.SuperAdmin);
+}
+<aside id="sidebar">
+    <nav id="mainNav">
+        <ul class="nav-list">
+            <li class="nav-item">
+                <a asp-controller="Home" asp-action="Index">
+                    <i class="fa-solid fa-house"></i> Dashboard
+                </a>
+            </li>
+
+            <li class="nav-item">
+                <a asp-controller="Crew" asp-action="Index">
+                    <i class="fa-solid fa-users"></i> Crew
+                </a>
+            </li>
+
+            <li class="nav-item has-children">
+                <button class="nav-toggle">
+                    <span><i class="fa-solid fa-chart-column"></i> Reports</span>
+                    <i class="fa-solid fa-chevron-down"></i>
+                </button>
+                <ul class="nav-submenu">
+                    <li><a href="#">Attendance</a></li>
+                    <li><a href="#">Payroll</a></li>
+                </ul>
+            </li>
+
+            @if (isSuperAdmin)
+            {
+                <li class="nav-item has-children">
+                    <button class="nav-toggle">
+                        <span><i class="fa-solid fa-gear"></i> Administration</span>
+                        <i class="fa-solid fa-chevron-down"></i>
+                    </button>
+                    <ul class="nav-submenu">
+                        <li><a asp-area="Admin" asp-controller="UserManagement" asp-action="Index">User Management</a></li>
+                        <li><a asp-area="Admin" asp-controller="RoleManagement" asp-action="Index">Role Permissions</a></li>
+                    </ul>
+                </li>
+            }
+        </ul>
+    </nav>
+</aside>
