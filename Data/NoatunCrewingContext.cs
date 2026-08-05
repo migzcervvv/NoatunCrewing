@@ -3,10 +3,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace NoatunCrewing.Data;
 
-public class NoatunCrewingContext : IdentityDbContext<ApplicationUser>
+public class NoatunCrewingContext(DbContextOptions<NoatunCrewingContext> options) : IdentityDbContext<ApplicationUser>(options)
 {
-    public NoatunCrewingContext(DbContextOptions<NoatunCrewingContext> options) : base(options) { }
-
     protected override void OnModelCreating(ModelBuilder builder)
     {
         base.OnModelCreating(builder);
