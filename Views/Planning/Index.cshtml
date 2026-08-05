@@ -1,0 +1,533 @@
+﻿@{
+    ViewData["Title"] = "Crew Planning Dashboard";
+
+    // Timeline: Apr 2026 -> Jun 2027 (15 months). Grouped by year for the header.
+    var timelineMonths = new[]
+    {
+        new { Label = "Apr", Year = 2026 }, new { Label = "May", Year = 2026 }, new { Label = "Jun", Year = 2026 },
+        new { Label = "Jul", Year = 2026 }, new { Label = "Aug", Year = 2026 }, new { Label = "Sep", Year = 2026 },
+        new { Label = "Oct", Year = 2026 }, new { Label = "Nov", Year = 2026 }, new { Label = "Dec", Year = 2026 },
+        new { Label = "Jan", Year = 2027 }, new { Label = "Feb", Year = 2027 }, new { Label = "Mar", Year = 2027 },
+        new { Label = "Apr", Year = 2027 }, new { Label = "May", Year = 2027 }, new { Label = "Jun", Year = 2027 }
+    };
+    var yearGroups = timelineMonths.GroupBy(m => m.Year).Select(g => new { Year = g.Key, Count = g.Count() }).ToList();
+}
+
+@section Styles {
+    <style>
+        .filter-panel {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 20px 24px;
+            margin-bottom: 20px;
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 16px;
+            align-items: end;
+        }
+
+        .filter-group label {
+            display: block;
+            font-weight: 600;
+            font-size: 13px;
+            margin-bottom: 6px;
+            color: var(--muted);
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 10px;
+            grid-column: span 5;
+            margin-top: 4px;
+        }
+
+        .legend-row {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 14px 20px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .legend-swatch {
+            width: 16px;
+            height: 10px;
+            border-radius: 3px;
+        }
+
+        .swatch-crew-a {
+            background: #16a34a;
+        }
+
+        .swatch-crew-b {
+            background: #0d9488;
+        }
+
+        .swatch-vacation {
+            background: #d97706;
+        }
+
+        .swatch-notassigned {
+            background: #d1d5db;
+            border: 1px dashed #9ca3af;
+        }
+
+        /* ---- Scroll shell ---- */
+        .planning-wrap {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow-x: auto;
+        }
+
+        .planning-grid {
+            display: grid;
+            grid-template-columns: 260px 1500px;
+            min-width: 1760px;
+        }
+
+        .col-left-sticky {
+            position: sticky;
+            left: 0;
+            z-index: 2;
+            background: white;
+        }
+
+        /* ---- Year header row ---- */
+        .planning-year-head-left {
+            border-right: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            background: #fafafa;
+        }
+
+        .planning-year-head-right {
+            display: grid;
+            background: #f1f5f9;
+            border-bottom: 1px solid var(--border);
+        }
+
+            .planning-year-head-right > div {
+                text-align: center;
+                font-weight: 700;
+                font-size: 12px;
+                letter-spacing: .06em;
+                color: #475569;
+                padding: 6px 0;
+                border-right: 1px solid var(--border);
+            }
+
+                .planning-year-head-right > div:last-child {
+                    border-right: none;
+                }
+
+        /* ---- Month header row ---- */
+        .planning-head-left {
+            font-weight: 700;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: .04em;
+            color: var(--muted);
+            background: #fafafa;
+            border-right: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+        }
+
+        .planning-head-right {
+            display: grid;
+            grid-template-columns: repeat(15, 1fr);
+            background: #fafafa;
+            border-bottom: 1px solid var(--border);
+        }
+
+            .planning-head-right > div {
+                padding: 10px 0;
+                text-align: center;
+                font-weight: 700;
+                font-size: 12px;
+                text-transform: uppercase;
+                letter-spacing: .04em;
+                color: var(--muted);
+                border-right: 1px solid var(--border);
+            }
+
+                .planning-head-right > div:last-child {
+                    border-right: none;
+                }
+
+        /* ---- Body rows ---- */
+        .planning-row-left {
+            border-right: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+            padding: 12px 16px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+            .planning-row-left .crew-name {
+                font-weight: 600;
+                font-size: 14px;
+            }
+
+            .planning-row-left .crew-meta {
+                font-size: 12px;
+                color: var(--muted);
+                margin-top: 2px;
+            }
+
+        .planning-row-right {
+            position: relative;
+            display: grid;
+            grid-template-columns: repeat(15, 1fr);
+            min-height: 62px;
+            border-bottom: 1px solid var(--border);
+        }
+
+            .planning-row-right > div {
+                border-right: 1px solid var(--border);
+            }
+
+                .planning-row-right > div:last-child {
+                    border-right: none;
+                }
+
+        .crew-bar {
+            position: absolute;
+            top: 16px;
+            height: 28px;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            padding: 0 8px;
+            font-size: 11px;
+            font-weight: 600;
+            color: white;
+            white-space: nowrap;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,.15);
+        }
+
+        .bar-crew-a {
+            background: #16a34a;
+        }
+
+        .bar-crew-b {
+            background: #0d9488;
+        }
+
+        .bar-crew-c {
+            background: #2563eb;
+        }
+
+        .bar-vacation {
+            background: #d97706;
+        }
+
+        .handover-mark {
+            position: absolute;
+            top: 12px;
+            width: 16px;
+            height: 36px;
+            margin-left: -8px;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+            .handover-mark i {
+                background: white;
+                border: 2px solid #64748b;
+                color: #64748b;
+                width: 14px;
+                height: 14px;
+                border-radius: 50%;
+                font-size: 8px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+        .not-assigned-tag {
+            position: absolute;
+            top: 20px;
+            left: 12px;
+            font-size: 12px;
+            color: var(--muted);
+            font-style: italic;
+        }
+
+        #ganttTooltip {
+            position: fixed;
+            display: none;
+            background: #1e293b;
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 12px;
+            line-height: 1.5;
+            pointer-events: none;
+            z-index: 3000;
+            box-shadow: 0 8px 20px rgba(0,0,0,.25);
+            max-width: 240px;
+        }
+
+            #ganttTooltip .tt-title {
+                font-weight: 700;
+                margin-bottom: 2px;
+            }
+
+            #ganttTooltip .tt-sub {
+                color: #cbd5e1;
+            }
+
+        @@media (max-width: 900px) {
+            .filter-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .filter-actions {
+                grid-column: span 2;
+            }
+        }
+    </style>
+}
+
+<div class="header">
+    <h2>@ViewData["Title"]</h2>
+    <div class="subtitle">Manage Planning in this page</div>
+    <div class="meta">Last refreshed @DateTime.Now.ToString("t")</div>
+</div>
+<div class="filter-panel">
+    <form method="get" asp-action="Index">
+        <div class="filter-grid">
+            <div class="filter-group">
+                <label for="year">Year</label>
+                <select id="year" name="year" class="form-control">
+                    <option value="2025">2025</option>
+                    <option value="2026" selected>2026</option>
+                    <option value="2027">2027</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="lastName">Last Name</label>
+                <input type="text" id="lastName" name="lastName" class="form-control" placeholder="e.g. Santos" />
+            </div>
+            <div class="filter-group">
+                <label for="principal">Principal</label>
+                <select id="principal" name="principal" class="form-control">
+                    <option value="">All Principals</option>
+                    <option value="Avior Marine">Avior Marine</option>
+                    <option value="Pacific Star Shipping">Pacific Star Shipping</option>
+                    <option value="Nordic Carriers Ltd">Nordic Carriers Ltd</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="vessel">Vessel</label>
+                <select id="vessel" name="vessel" class="form-control">
+                    <option value="">All Vessels</option>
+                    <option value="MV Horizon Star">MV Horizon Star</option>
+                    <option value="MV Coral Voyager">MV Coral Voyager</option>
+                    <option value="MV Nordic Trader">MV Nordic Trader</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="status">Assignment Status</label>
+                <select id="status" name="status" class="form-control">
+                    <option value="">All Statuses</option>
+                    <option value="OnBoard">On-board</option>
+                    <option value="OnVacation">On Vacation</option>
+                    <option value="Assigned">Assigned</option>
+                    <option value="NotAssigned">Not Assigned</option>
+                </select>
+            </div>
+            <div class="filter-actions">
+                <button type="submit" class="btn-primary">
+                    <i class="fa-solid fa-filter"></i> Apply Filters
+                </button>
+                <a asp-action="Index" class="btn-secondary">Clear</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="legend-row">
+    <div class="legend-item"><span class="legend-swatch swatch-crew-a"></span> Crew (1st in slot)</div>
+    <div class="legend-item"><span class="legend-swatch swatch-crew-b"></span> Reliever (2nd in slot)</div>
+    <div class="legend-item"><span class="legend-swatch swatch-vacation"></span> On Vacation</div>
+    <div class="legend-item"><span class="legend-swatch swatch-notassigned"></span> Not Assigned</div>
+    <div class="legend-item"><i class="fa-solid fa-arrows-left-right" style="color:#64748b;"></i> Handover point</div>
+</div>
+
+<div class="planning-wrap">
+    <div class="planning-grid">
+
+        @* ---- Year header ---- *@
+        <div class="planning-year-head-left col-left-sticky"></div>
+        <div class="planning-year-head-right" style="grid-template-columns: @string.Join(" ", yearGroups.Select(g => $"{g.Count}fr"));">
+            @foreach (var g in yearGroups)
+            {
+                <div>@g.Year</div>
+            }
+        </div>
+
+        @* ---- Month header ---- *@
+        <div class="planning-head-left col-left-sticky">Crew / Position</div>
+        <div class="planning-head-right">
+            @foreach (var m in timelineMonths)
+            {
+                <div>@m.Label</div>
+            }
+        </div>
+
+        @* ---- Row 1: MV Horizon Star - Chief Engineer slot: Santos -> Odhiambo -> Dela Cruz ---- *@
+        <div class="planning-row-left col-left-sticky">
+            <div class="crew-name">MV Horizon Star</div>
+            <div class="crew-meta">Chief Engineer &middot; Pacific Star Shipping</div>
+        </div>
+        <div class="planning-row-right">
+            @for (int i = 0; i < 15; i++)
+            {
+                <div></div>
+            }
+
+            <div class="crew-bar bar-crew-a"
+                 style="left:1.97%; width:27.85%;"
+                 data-title="Santos, Juan"
+                 data-sub="On-board: Apr 10, 2026 &rarr; Aug 15, 2026">
+                Santos, J.
+            </div>
+            <div class="handover-mark" style="left:29.82%;" title="Handover: Santos &rarr; Odhiambo">
+                <i class="fa-solid fa-right-left"></i>
+            </div>
+
+            <div class="crew-bar bar-crew-b"
+                 style="left:29.82%; width:41.45%;"
+                 data-title="Odhiambo, Brian"
+                 data-sub="Reliever &middot; On-board: Aug 15, 2026 &rarr; Feb 20, 2027">
+                Odhiambo, B.
+            </div>
+            <div class="handover-mark" style="left:71.27%;" title="Handover: Odhiambo &rarr; Dela Cruz">
+                <i class="fa-solid fa-right-left"></i>
+            </div>
+
+            <div class="crew-bar bar-crew-a"
+                 style="left:71.27%; width:28.73%;"
+                 data-title="Dela Cruz, Carlos"
+                 data-sub="Reliever &middot; On-board: Feb 20, 2027 &rarr; Jun 30, 2027 (ongoing)">
+                Dela Cruz, C.
+            </div>
+        </div>
+
+        @* ---- Row 2: MV Coral Voyager - Bosun slot: Mwangi -> Otieno ---- *@
+        <div class="planning-row-left col-left-sticky">
+            <div class="crew-name">MV Coral Voyager</div>
+            <div class="crew-meta">Bosun &middot; Nordic Carriers Ltd</div>
+        </div>
+        <div class="planning-row-right">
+            @for (int i = 0; i < 15; i++)
+            {
+                <div></div>
+            }
+
+            <div class="crew-bar bar-crew-a"
+                 style="left:0%; width:46.93%;"
+                 data-title="Mwangi, Peter"
+                 data-sub="On-board: Apr 1, 2026 &rarr; Nov 1, 2026">
+                Mwangi, P.
+            </div>
+            <div class="handover-mark" style="left:46.93%;" title="Handover: Mwangi &rarr; Otieno">
+                <i class="fa-solid fa-right-left"></i>
+            </div>
+
+            <div class="crew-bar bar-crew-b"
+                 style="left:46.93%; width:42.76%;"
+                 data-title="Otieno, David"
+                 data-sub="Reliever &middot; On-board: Nov 1, 2026 &rarr; May 15, 2027">
+                Otieno, D.
+            </div>
+        </div>
+
+        @* ---- Row 3: MV Nordic Trader - Able Seaman: Kimani, no reliever ---- *@
+        <div class="planning-row-left col-left-sticky">
+            <div class="crew-name">MV Nordic Trader</div>
+            <div class="crew-meta">Able Seaman &middot; Nordic Carriers Ltd</div>
+        </div>
+        <div class="planning-row-right">
+            @for (int i = 0; i < 15; i++)
+            {
+                <div></div>
+            }
+
+            <div class="crew-bar bar-crew-a"
+                 style="left:0%; width:100%;"
+                 data-title="Kimani, Grace"
+                 data-sub="On-board: Apr 1, 2026 &rarr; Jun 30, 2027">
+                Kimani, G.
+            </div>
+        </div>
+
+        @* ---- Row 4: Not assigned ---- *@
+        <div class="planning-row-left col-left-sticky">
+            <div class="crew-name">Reyes, Maria</div>
+            <div class="crew-meta">Avior Marine &middot; Bench</div>
+        </div>
+        <div class="planning-row-right">
+            @for (int i = 0; i < 15; i++)
+            {
+                <div></div>
+            }
+            <span class="not-assigned-tag">Not Assigned</span>
+        </div>
+
+    </div>
+</div>
+
+<div id="ganttTooltip">
+    <div class="tt-title"></div>
+    <div class="tt-sub"></div>
+</div>
+
+@section Scripts {
+    <script>
+        (function () {
+            const tooltip = document.getElementById("ganttTooltip");
+            const ttTitle = tooltip.querySelector(".tt-title");
+            const ttSub = tooltip.querySelector(".tt-sub");
+
+            document.querySelectorAll(".crew-bar").forEach(function (bar) {
+                bar.addEventListener("mouseenter", function () {
+                    ttTitle.textContent = bar.dataset.title || "";
+                    ttSub.innerHTML = bar.dataset.sub || "";
+                    tooltip.style.display = "block";
+                });
+                bar.addEventListener("mousemove", function (e) {
+                    tooltip.style.left = (e.clientX + 16) + "px";
+                    tooltip.style.top = (e.clientY + 16) + "px";
+                });
+                bar.addEventListener("mouseleave", function () {
+                    tooltip.style.display = "none";
+                });
+            });
+        })();
+    </script>
+}

@@ -1,8 +1,6 @@
-using Microsoft.AspNetCore.Identity;
+namespace NoatunCrewing.Controllers;
 
-namespace NoatunCrewing.Areas.Admin.Controllers;
-
-[Area("Admin")]
+[Route("Admin/UserManagement/[action]")]
 [Authorize(Policy = AppPolicies.AdminOnly)]
 public class UserManagementController(UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager) : Controller
 {
@@ -232,12 +230,12 @@ public class UserManagementController(UserManager<ApplicationUser> userManager, 
 
         if (await userManager.IsLockedOutAsync(user))
         {
-            await userManager.SetLockoutEndDateAsync(user, System.DateTimeOffset.UtcNow.AddYears(-1));
+            await userManager.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow.AddYears(-1));
         }
         else
         {
             await userManager.SetLockoutEnabledAsync(user, true);
-            await userManager.SetLockoutEndDateAsync(user, System.DateTimeOffset.UtcNow.AddYears(100));
+            await userManager.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow.AddYears(100));
         }
 
         return RedirectToAction(nameof(Index));

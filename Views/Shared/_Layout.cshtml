@@ -66,7 +66,7 @@
                     <hr />
                     @if (User.Identity?.IsAuthenticated == true)
                     {
-                        <form asp-area="@null" asp-controller="Account" asp-action="Logout" method="post" id="logoutForm">
+                        <form asp-controller="Account" asp-action="Logout" method="post" id="logoutForm">
                             <button type="submit" class="logout-button">
                                 <i class="fa-solid fa-right-from-bracket"></i> Logout
                             </button>

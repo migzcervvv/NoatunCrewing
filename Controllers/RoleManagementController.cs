@@ -1,6 +1,6 @@
-namespace NoatunCrewing.Areas.Admin.Controllers;
+namespace NoatunCrewing.Controllers;
 
-[Area("Admin")]
+[Route("Admin/RoleManagement/[action]")]
 [Authorize(Policy = AppPolicies.AdminOnly)]
 public class RoleManagementController(RoleManager<IdentityRole> roleManager, UserManager<ApplicationUser> userManager) : Controller
 {

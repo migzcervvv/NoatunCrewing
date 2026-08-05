@@ -1,11 +1,227 @@
 @{
     ViewData["Title"] = "Crew";
 }
-<div class="admin-toolbar">
-    <h1 class="h3 mb-0">Crew</h1>
-    <a class="btn btn-primary" asp-action="Create">New Crew Member</a>
+
+@section Styles {
+    <style>
+        .filter-panel {
+            background: white;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 20px 24px;
+            margin-bottom: 20px;
+        }
+
+        .filter-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            align-items: end;
+        }
+
+        .filter-group label {
+            display: block;
+            font-weight: 600;
+            font-size: 13px;
+            margin-bottom: 6px;
+            color: var(--muted);
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 10px;
+            grid-column: span 4;
+            margin-top: 4px;
+        }
+
+        .source-tag {
+            font-size: 11px;
+            font-weight: 700;
+            padding: 2px 8px;
+            border-radius: 999px;
+            margin-left: 6px;
+        }
+
+        .source-ams {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .source-noatun {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge-onboard {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .badge-vacation {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-assigned {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge-notassigned {
+            background: #f3f4f6;
+            color: #6b7280;
+        }
+
+        @@media (max-width: 900px) {
+            .filter-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .filter-actions {
+                grid-column: span 2;
+            }
+        }
+
+        @@media (max-width: 560px) {
+            .filter-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .filter-actions {
+                grid-column: span 1;
+            }
+        }
+    </style>
+}
+
+<div class="header">
+    <h2>@ViewData["Title"]</h2>
+    <div class="subtitle">Manage Crew in this page</div>
+    <div class="meta">Last refreshed @DateTime.Now.ToString("t")</div>
 </div>
-<p class="text-muted">
-    Listing pending crew entity models (AMS-sourced Filipino crew + NoatunCrewing-sourced Kenyan crew).
-    Wire this up once <code>ICrewDataService</code> has real query methods.
-</p>
+<div class="admin-toolbar">
+    <a asp-action="Create" class="btn-primary">
+        <i class="fa-solid fa-plus"></i> New Role
+    </a>
+</div>
+
+<div class="filter-panel">
+    <form method="get" asp-action="Index">
+        <div class="filter-grid">
+            <div class="filter-group">
+                <label for="lastName">Last Name</label>
+                <input type="text" id="lastName" name="lastName" class="form-control" placeholder="e.g. Santos" />
+            </div>
+            <div class="filter-group">
+                <label for="principal">Principal</label>
+                <select id="principal" name="principal" class="form-control">
+                    <option value="">All Principals</option>
+                    <option value="Avior Marine">Avior Marine</option>
+                    <option value="Pacific Star Shipping">Pacific Star Shipping</option>
+                    <option value="Nordic Carriers Ltd">Nordic Carriers Ltd</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="vessel">Vessel</label>
+                <select id="vessel" name="vessel" class="form-control">
+                    <option value="">All Vessels</option>
+                    <option value="MV Horizon Star">MV Horizon Star</option>
+                    <option value="MV Coral Voyager">MV Coral Voyager</option>
+                    <option value="MV Nordic Trader">MV Nordic Trader</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="status">Assignment Status</label>
+                <select id="status" name="status" class="form-control">
+                    <option value="">All Statuses</option>
+                    <option value="OnBoard">On-board</option>
+                    <option value="OnVacation">On Vacation</option>
+                    <option value="Assigned">Assigned</option>
+                    <option value="NotAssigned">Not Assigned</option>
+                </select>
+            </div>
+            <div class="filter-actions">
+                <button type="submit" class="btn-primary">
+                    <i class="fa-solid fa-filter"></i> Apply Filters
+                </button>
+                <a asp-action="Index" class="btn-secondary">Clear</a>
+            </div>
+        </div>
+    </form>
+</div>
+
+<div class="admin-table-wrap">
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>Last Name</th>
+                <th>First Name</th>
+                <th>Nationality</th>
+                <th>Principal</th>
+                <th>Vessel</th>
+                <th>Assignment Status</th>
+                <th class="text-right">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Santos</td>
+                <td>Juan</td>
+                <td>Filipino <span class="source-tag source-ams">AMS</span></td>
+                <td>Pacific Star Shipping</td>
+                <td>MV Horizon Star</td>
+                <td><span class="badge badge-onboard">On-board</span></td>
+                <td class="text-right">
+                    <a href="@Url.Action("Details", new { id = "1", nationality = "Filipino" })" title="View">
+                        <i class="fa-solid fa-eye"></i>
+                    </a>
+                </td>
+            </tr>
+            <tr>
+                <td>Odhiambo</td>
+                <td>Brian</td>
+                <td>Kenyan <span class="source-tag source-noatun">Noatun</span></td>
+                <td>Nordic Carriers Ltd</td>
+                <td>MV Nordic Trader</td>
+                <td><span class="badge badge-assigned">Assigned</span></td>
+                <td class="text-right">
+                    <a href="@Url.Action("Details", new { id = "2", nationality = "Kenyan" })" title="View">
+                        <i class="fa-solid fa-eye"></i>
+                    </a>
+                    <a href="#" title="Edit">
+                        <i class="fa-solid fa-pen"></i>
+                    </a>
+                </td>
+            </tr>
+            <tr>
+                <td>Reyes</td>
+                <td>Maria</td>
+                <td>Filipino <span class="source-tag source-ams">AMS</span></td>
+                <td>Avior Marine</td>
+                <td>&mdash;</td>
+                <td><span class="badge badge-notassigned">Not Assigned</span></td>
+                <td class="text-right">
+                    <a href="@Url.Action("Details", new { id = "3", nationality = "Filipino" })" title="View">
+                        <i class="fa-solid fa-eye"></i>
+                    </a>
+                </td>
+            </tr>
+            <tr>
+                <td>Mwangi</td>
+                <td>Peter</td>
+                <td>Kenyan <span class="source-tag source-noatun">Noatun</span></td>
+                <td>Nordic Carriers Ltd</td>
+                <td>MV Coral Voyager</td>
+                <td><span class="badge badge-vacation">On Vacation</span></td>
+                <td class="text-right">
+                    <a href="@Url.Action("Details", new { id = "4", nationality = "Kenyan" })" title="View">
+                        <i class="fa-solid fa-eye"></i>
+                    </a>
+                    <a href="#" title="Edit">
+                        <i class="fa-solid fa-pen"></i>
+                    </a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

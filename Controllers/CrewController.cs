@@ -5,15 +5,8 @@ namespace NoatunCrewing.Controllers;
 // per action, not per controller, because write actions are only valid for
 // the NoatunCrewing-sourced half of the data.
 [Authorize]
-public class CrewController : Controller
+public class CrewController(ICrewDataService crewDataService) : Controller
 {
-    private readonly ICrewDataService _crewDataService;
-
-    public CrewController(ICrewDataService crewDataService)
-    {
-        _crewDataService = crewDataService;
-    }
-
     [Authorize(Policy = AppPolicies.CanReadAmsData)]
     public IActionResult Index()
     {
@@ -24,7 +17,7 @@ public class CrewController : Controller
     [Authorize(Policy = AppPolicies.CanReadAmsData)]
     public IActionResult Details(string id, string nationality)
     {
-        var source = _crewDataService.ResolveSource(nationality);
+        var source = crewDataService.ResolveSource(nationality);
         ViewBag.Source = source;
         return View();
     }
